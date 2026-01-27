@@ -46,6 +46,9 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "EXPO_PUBLIC_GRAPHQL_URL": "http://localhost:2003/strapi-proxy"
     }
   }
 }
