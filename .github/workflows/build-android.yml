@@ -19,21 +19,62 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Expo
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build FAT APK
-        run: eas build --platform android --profile production --non-interactive
+      - name: Generate Android keystore
+        run: |
+          mkdir -p android/app
+          keytool -genkeypair -v -storetype PKCS12 \
+            -keystore android/app/release.keystore \
+            -alias gandul-key \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass ${{ secrets.KEYSTORE_PASSWORD || 'gandul123' }} \
+            -keypass ${{ secrets.KEY_PASSWORD || 'gandul123' }} \
+            -dname "CN=Gandul, OU=Mobile, O=Gandul, L=Bucharest, ST=Romania, C=RO"
+
+      - name: Prebuild Android
+        run: npx expo prebuild --platform android --clean
         env:
           EXPO_PUBLIC_GRAPHQL_URL: ${{ secrets.FAT_GRAPHQL_URL }}
           EXPO_PUBLIC_ENV: fat
+
+      - name: Configure Android Signing
+        run: |
+          chmod +x .github/scripts/configure-android-signing.sh
+          .github/scripts/configure-android-signing.sh
+
+      - name: Build Android Release APK
+        working-directory: android
+        run: ./gradlew assembleRelease
+        env:
+          EXPO_PUBLIC_GRAPHQL_URL: ${{ secrets.FAT_GRAPHQL_URL }}
+          EXPO_PUBLIC_ENV: fat
+          MYAPP_RELEASE_STORE_FILE: app/release.keystore
+          MYAPP_RELEASE_KEY_ALIAS: gandul-key
+          MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'gandul123' }}
+          MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'gandul123' }}
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gandul-fat-release.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
 
       - name: Build summary
         run: |
@@ -41,7 +82,9 @@ jobs:
           echo "📱 Environment: FAT"
           echo "🌐 Branch: master"
           echo ""
+          echo "📦 APK built and uploaded as artifact"
+          echo ""
           echo "📋 Next steps:"
-          echo "1. Test the FAT build"
-          echo "2. Create PR to promote to UAT"
-          echo "3. Add 'deploy-uat' label to PR"
+          echo "1. Download APK from Actions artifacts"
+          echo "2. Test the FAT build"
+          echo "3. Create PR to promote to UAT"

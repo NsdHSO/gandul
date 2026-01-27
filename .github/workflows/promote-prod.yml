@@ -25,11 +25,19 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Expo
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
@@ -40,11 +48,44 @@ jobs:
           echo "📦 Building production version"
           # Version should be updated in app.json before merging
 
-      - name: Build PRODUCTION APK
-        run: eas build --platform android --profile production --non-interactive
+      - name: Generate Android keystore
+        run: |
+          mkdir -p android/app
+          keytool -genkeypair -v -storetype PKCS12 \
+            -keystore android/app/release.keystore \
+            -alias gandul-key \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass ${{ secrets.KEYSTORE_PASSWORD || 'gandul123' }} \
+            -keypass ${{ secrets.KEY_PASSWORD || 'gandul123' }} \
+            -dname "CN=Gandul, OU=Mobile, O=Gandul, L=Bucharest, ST=Romania, C=RO"
+
+      - name: Prebuild Android
+        run: npx expo prebuild --platform android --clean
         env:
           EXPO_PUBLIC_GRAPHQL_URL: ${{ secrets.PROD_GRAPHQL_URL }}
           EXPO_PUBLIC_ENV: production
+
+      - name: Configure Android Signing
+        run: |
+          chmod +x .github/scripts/configure-android-signing.sh
+          .github/scripts/configure-android-signing.sh
+
+      - name: Build PRODUCTION APK
+        working-directory: android
+        run: ./gradlew assembleRelease
+        env:
+          EXPO_PUBLIC_GRAPHQL_URL: ${{ secrets.PROD_GRAPHQL_URL }}
+          EXPO_PUBLIC_ENV: production
+          MYAPP_RELEASE_STORE_FILE: app/release.keystore
+          MYAPP_RELEASE_KEY_ALIAS: gandul-key
+          MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'gandul123' }}
+          MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'gandul123' }}
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gandul-production-release.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
 
       - name: Comment on PR
         uses: actions/github-script@v7
@@ -59,12 +100,13 @@ jobs:
             📱 Environment: **PRODUCTION**
             🔗 GraphQL URL: \`${{ secrets.PROD_GRAPHQL_URL }}\`
 
+            📦 **Download APK:**
+            Go to [Actions > Artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) and download \`gandul-production-release.apk\`
+
             ⚠️ **Important:**
             - Download and verify the production build
             - Test thoroughly before releasing to users
-            - Merge this PR to deploy to production
-
-            🔗 [View build details](https://expo.dev)`
+            - Merge this PR to deploy to production`
             })
 
       - name: Create release tag
