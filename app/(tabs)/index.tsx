@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -8,9 +9,11 @@ import type { Article } from '@/lib/models/article';
 
 export default function HomeScreen() {
     const { articles, loading, error, refetch } = useArticles();
+    const router = useRouter();
 
     const renderArticle = ({ item }: { item: Article }) => (
         <Pressable
+            onPress={() => router.push(`/article/${item.documentId}`)}
             className="mb-4 overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm"
         >
             <View className="relative">
@@ -83,7 +86,7 @@ export default function HomeScreen() {
             <FlatList
                 data={articles}
                 renderItem={renderArticle}
-                keyExtractor={(item, index) => `${item.title}-${index}`}
+                keyExtractor={(item) => item.documentId}
                 contentContainerStyle={styles.listContainer}
                 ListHeaderComponent={
                     <ThemedView className="mb-6">

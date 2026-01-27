@@ -2,10 +2,43 @@
 
 export const ARTICLES_QUERY = `
   query {
-    articles {
+    articles(sort: "publishedDate:desc") {
+      documentId
       title
-      featuredImage
+      slug
+      description
+      author
       publishedDate
+      category
+      tags
+      featuredImage
+      sourceUrl
+      videoUrl
+      createdAt
+      updatedAt
+      publishedAt
+    }
+  }
+`;
+
+export const ARTICLE_BY_ID_QUERY = `
+  query GetArticle($documentId: ID!) {
+    article(documentId: $documentId) {
+      documentId
+      title
+      slug
+      description
+      content
+      author
+      publishedDate
+      category
+      tags
+      featuredImage
+      sourceUrl
+      videoUrl
+      createdAt
+      updatedAt
+      publishedAt
     }
   }
 `;
