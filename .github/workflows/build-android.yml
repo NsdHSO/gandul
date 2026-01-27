@@ -1,26 +1,14 @@
-name: Build Android App
+name: Build FAT (master)
 
 on:
   push:
     branches:
-      - fat
-      - staging
-      - uat
-      - main
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to build'
-        required: true
-        type: choice
-        options:
-          - fat
-          - uat
-          - production
+      - master
 
 jobs:
-  build:
+  build-fat:
     runs-on: ubuntu-latest
+    environment: FAT
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,35 +29,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Set environment variables - FAT/Staging
-        if: github.ref == 'refs/heads/fat' || github.ref == 'refs/heads/staging' || inputs.environment == 'fat'
-        run: |
-          echo "EXPO_PUBLIC_GRAPHQL_URL=${{ secrets.FAT_GRAPHQL_URL }}" >> $GITHUB_ENV
-          echo "EXPO_PUBLIC_ENV=fat" >> $GITHUB_ENV
-          echo "BUILD_ENV=FAT" >> $GITHUB_ENV
-
-      - name: Set environment variables - UAT
-        if: github.ref == 'refs/heads/uat' || inputs.environment == 'uat'
-        run: |
-          echo "EXPO_PUBLIC_GRAPHQL_URL=${{ secrets.UAT_GRAPHQL_URL }}" >> $GITHUB_ENV
-          echo "EXPO_PUBLIC_ENV=uat" >> $GITHUB_ENV
-          echo "BUILD_ENV=UAT" >> $GITHUB_ENV
-
-      - name: Set environment variables - Production
-        if: github.ref == 'refs/heads/main' || inputs.environment == 'production'
-        run: |
-          echo "EXPO_PUBLIC_GRAPHQL_URL=${{ secrets.PROD_GRAPHQL_URL }}" >> $GITHUB_ENV
-          echo "EXPO_PUBLIC_ENV=production" >> $GITHUB_ENV
-          echo "BUILD_ENV=PRODUCTION" >> $GITHUB_ENV
-
-      - name: Build Android APK
-        run: eas build --platform android --profile production --non-interactive --no-wait
+      - name: Build FAT APK
+        run: eas build --platform android --profile production --non-interactive
         env:
-          EXPO_PUBLIC_GRAPHQL_URL: ${{ env.EXPO_PUBLIC_GRAPHQL_URL }}
-          EXPO_PUBLIC_ENV: ${{ env.EXPO_PUBLIC_ENV }}
+          EXPO_PUBLIC_GRAPHQL_URL: ${{ secrets.FAT_GRAPHQL_URL }}
+          EXPO_PUBLIC_ENV: fat
 
-      - name: Comment build info
-        if: github.event_name == 'push'
+      - name: Build summary
         run: |
-          echo "Building ${{ env.BUILD_ENV }} environment"
-          echo "GraphQL URL: ${{ env.EXPO_PUBLIC_GRAPHQL_URL }}"
+          echo "✅ FAT build completed successfully"
+          echo "📱 Environment: FAT"
+          echo "🌐 Branch: master"
+          echo ""
+          echo "📋 Next steps:"
+          echo "1. Test the FAT build"
+          echo "2. Create PR to promote to UAT"
+          echo "3. Add 'deploy-uat' label to PR"
