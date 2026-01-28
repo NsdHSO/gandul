@@ -23,4 +23,68 @@ jest.mock('expo-router', () => ({
   }),
   useLocalSearchParams: () => ({}),
   Link: 'Link',
+  Stack: {
+    Screen: ({ children }) => children || null,
+  },
+}));
+
+// Mock expo-constants
+jest.mock('expo-constants', () => ({
+  default: {
+    expoConfig: {
+      extra: {
+        EXPO_PUBLIC_GRAPHQL_URL: 'http://test-url.com/graphql',
+      },
+    },
+  },
+}));
+
+// Mock @expo/vector-icons
+jest.mock('@expo/vector-icons/MaterialIcons', () => 'MaterialIcons');
+
+// Mock expo-symbols
+jest.mock('expo-symbols', () => ({
+  SymbolView: 'SymbolView',
+}));
+
+// Mock hooks
+jest.mock('@/hooks/use-theme-color', () => ({
+  useThemeColor: jest.fn((colors) => colors?.light || '#000000'),
+}));
+
+jest.mock('@/hooks/use-color-scheme', () => ({
+  useColorScheme: jest.fn(() => 'light'),
+}));
+
+// Mock expo-web-browser
+jest.mock('expo-web-browser', () => ({
+  openBrowserAsync: jest.fn(),
+  WebBrowserPresentationStyle: {
+    AUTOMATIC: 0,
+  },
+}));
+
+// Mock expo-haptics
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(),
+  ImpactFeedbackStyle: {
+    Light: 'light',
+  },
+}));
+
+// Mock react-native-reanimated
+jest.mock('react-native-reanimated', () => {
+  const Reanimated = require('react-native-reanimated/mock');
+  Reanimated.default.call = () => {};
+  return {
+    ...Reanimated,
+    useAnimatedRef: jest.fn(() => ({ current: null })),
+    useScrollOffset: jest.fn(() => ({ value: 0 })),
+    useAnimatedStyle: jest.fn((callback) => callback()),
+  };
+});
+
+// Mock @react-navigation/elements
+jest.mock('@react-navigation/elements', () => ({
+  PlatformPressable: 'PlatformPressable',
 }));
