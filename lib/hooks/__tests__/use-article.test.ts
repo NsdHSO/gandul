@@ -116,7 +116,7 @@ describe('useArticle Hook', () => {
   it('should refetch article when refetch is called', async () => {
     const updatedArticle = { ...mockArticle, title: 'Updated Title' };
 
-    (graphqlClient.query as jest.Mock)
+    const mockQuery = jest.fn()
       .mockReturnValueOnce({
         toPromise: jest.fn().mockResolvedValue({
           data: { article: mockArticle },
@@ -130,6 +130,8 @@ describe('useArticle Hook', () => {
         }),
       });
 
+    (graphqlClient.query as jest.Mock) = mockQuery;
+
     const { result } = renderHook(() => useArticle('1'));
 
     await waitFor(() => {
@@ -138,13 +140,13 @@ describe('useArticle Hook', () => {
 
     expect(result.current.article?.title).toBe('Test Article');
 
-    await result.current.refetch();
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+    await waitFor(async () => {
+      await result.current.refetch();
     });
 
-    expect(result.current.article?.title).toBe('Updated Title');
+    await waitFor(() => {
+      expect(result.current.article?.title).toBe('Updated Title');
+    });
   });
 
   it('should fetch article when documentId changes', async () => {

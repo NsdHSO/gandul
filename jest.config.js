@@ -4,8 +4,16 @@ module.exports = {
   testEnvironment: 'node',
   transformIgnorePatterns: [],
   testMatch: [
-    '**/__tests__/**/*.{js,jsx,ts,tsx}',
-    '**/*.{spec,test}.{js,jsx,ts,tsx}',
+    '<rootDir>/components/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/lib/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/app/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/**/*.{spec,test}.{js,jsx,ts,tsx}',
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/.expo/',
+    '/android/',
+    '/ios/',
   ],
   collectCoverageFrom: [
     'components/**/*.{js,jsx,ts,tsx}',

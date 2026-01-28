@@ -83,7 +83,8 @@ describe('useArticles Hook', () => {
 
     expect(result.current.articles).toEqual(mockArticles);
     expect(result.current.error).toBeNull();
-    expect(result.current.hasMore).toBe(true);
+    // hasMore is false because we only returned 2 articles (less than PAGE_SIZE of 20)
+    expect(result.current.hasMore).toBe(false);
   });
 
   it('should handle GraphQL errors', async () => {
@@ -158,13 +159,13 @@ describe('useArticles Hook', () => {
       title: `Article ${i + 1}`,
     }));
 
-    const secondBatch = Array(10).fill(null).map((_, i) => ({
+    const secondBatch = Array(20).fill(null).map((_, i) => ({
       ...mockArticles[0],
       documentId: `${i + 21}`,
       title: `Article ${i + 21}`,
     }));
 
-    (graphqlClient.query as jest.Mock)
+    const mockQuery = jest.fn()
       .mockReturnValueOnce({
         toPromise: jest.fn().mockResolvedValue({
           data: { articles: firstBatch },
@@ -178,6 +179,8 @@ describe('useArticles Hook', () => {
         }),
       });
 
+    (graphqlClient.query as jest.Mock) = mockQuery;
+
     const { result } = renderHook(() => useArticles());
 
     await waitFor(() => {
@@ -186,13 +189,13 @@ describe('useArticles Hook', () => {
 
     expect(result.current.articles).toHaveLength(20);
 
-    await result.current.loadMore();
-
-    await waitFor(() => {
-      expect(result.current.loadingMore).toBe(false);
+    await waitFor(async () => {
+      await result.current.loadMore();
     });
 
-    expect(result.current.articles).toHaveLength(30);
+    await waitFor(() => {
+      expect(result.current.articles).toHaveLength(40);
+    });
   });
 
   it('should not load more if already loading', async () => {
@@ -244,7 +247,7 @@ describe('useArticles Hook', () => {
   });
 
   it('should refetch articles and reset state', async () => {
-    (graphqlClient.query as jest.Mock)
+    const mockQuery = jest.fn()
       .mockReturnValueOnce({
         toPromise: jest.fn().mockResolvedValue({
           data: { articles: mockArticles },
@@ -258,6 +261,8 @@ describe('useArticles Hook', () => {
         }),
       });
 
+    (graphqlClient.query as jest.Mock) = mockQuery;
+
     const { result } = renderHook(() => useArticles());
 
     await waitFor(() => {
@@ -266,12 +271,12 @@ describe('useArticles Hook', () => {
 
     expect(result.current.articles).toHaveLength(2);
 
-    await result.current.refetch();
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+    await waitFor(async () => {
+      await result.current.refetch();
     });
 
-    expect(result.current.articles).toHaveLength(1);
+    await waitFor(() => {
+      expect(result.current.articles).toHaveLength(1);
+    });
   });
 });

@@ -15,18 +15,31 @@ jest.mock('expo-image', () => ({
 }));
 
 // Mock expo-router
-jest.mock('expo-router', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-  }),
-  useLocalSearchParams: () => ({}),
-  Link: 'Link',
-  Stack: {
-    Screen: ({ children }) => children || null,
-  },
-}));
+jest.mock('expo-router', () => {
+  const React = require('react');
+  const { Pressable } = require('react-native');
+  return {
+    useRouter: () => ({
+      push: jest.fn(),
+      replace: jest.fn(),
+      back: jest.fn(),
+    }),
+    useLocalSearchParams: () => ({}),
+    Link: ({ children, onPress, ...props }) =>
+      React.createElement(Pressable, {
+        ...props,
+        onPress: (e) => {
+          const event = e || {};
+          event.preventDefault = event.preventDefault || jest.fn();
+          onPress?.(event);
+        },
+        testID: props.testID || 'expo-router-link'
+      }, children),
+    Stack: {
+      Screen: ({ children }) => children || null,
+    },
+  };
+});
 
 // Mock expo-constants
 jest.mock('expo-constants', () => ({
@@ -85,6 +98,13 @@ jest.mock('react-native-reanimated', () => {
 });
 
 // Mock @react-navigation/elements
-jest.mock('@react-navigation/elements', () => ({
-  PlatformPressable: 'PlatformPressable',
-}));
+jest.mock('@react-navigation/elements', () => {
+  const React = require('react');
+  const { Pressable } = require('react-native');
+  return {
+    PlatformPressable: ({ children, ...props }) =>
+      React.createElement(Pressable, props, children),
+  };
+});
+
+// Mock Linking module will be done per-test as needed
