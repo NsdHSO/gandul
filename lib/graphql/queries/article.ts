@@ -1,8 +1,8 @@
 // Article queries for Strapi GraphQL API
 
 export const ARTICLES_QUERY = `
-  query {
-    articles(sort: "publishedDate:desc") {
+  query GetArticles($limit: Int, $start: Int) {
+    articles(sort: "publishedDate:desc", pagination: { limit: $limit, start: $start }) {
       documentId
       title
       slug

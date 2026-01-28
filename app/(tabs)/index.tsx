@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -8,7 +9,7 @@ import { useArticles } from '@/lib/hooks/use-articles';
 import type { Article } from '@/lib/models/article';
 
 export default function HomeScreen() {
-    const { articles, loading, error, refetch } = useArticles();
+    const { articles, loading, loadingMore, error, refetch, loadMore } = useArticles();
     const router = useRouter();
 
     const renderArticle = ({ item }: { item: Article }) => (
@@ -81,13 +82,27 @@ export default function HomeScreen() {
         );
     }
 
+    const renderFooter = () => {
+        if (!loadingMore) return null;
+
+        return (
+            <View className="py-4">
+                <ActivityIndicator size="small" />
+            </View>
+        );
+    };
+
     return (
-        <ThemedView className="flex-1">
-            <FlatList
+        <ThemedView className="flex-1"
+        style={{ width: '100%' }}
+        >
+            <FlashList
                 data={articles}
                 renderItem={renderArticle}
                 keyExtractor={(item) => item.documentId}
                 contentContainerStyle={styles.listContainer}
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.5}
                 ListHeaderComponent={
                     <ThemedView className="mb-6">
                         <ThemedText type="title" className="mb-2">
@@ -98,6 +113,7 @@ export default function HomeScreen() {
                         </ThemedText>
                     </ThemedView>
                 }
+                ListFooterComponent={renderFooter}
             />
         </ThemedView>
     );
@@ -105,7 +121,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
     listContainer: {
-        padding: 16,
+        padding: 16
     },
     articleImage: {
         width: '100%',
