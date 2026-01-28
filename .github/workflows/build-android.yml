@@ -13,11 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -33,9 +30,6 @@ jobs:
         with:
           expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Generate Android keystore
         run: |
