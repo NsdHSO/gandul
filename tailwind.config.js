@@ -1,3 +1,5 @@
+const categoryColors = require('./theme/category-colors');
+
 module.exports = {
     content: [
         "./app/**/*.{js,jsx,ts,tsx}",
@@ -6,6 +8,9 @@ module.exports = {
     presets: [require("nativewind/preset")],
     theme: {
         extend: {
+            // Category colors for article badges
+            colors: categoryColors,
+
             // Accessible font sizes (minimum 16px for body text per WCAG)
             fontSize: {
                 // Small text - use sparingly, ensure proper contrast

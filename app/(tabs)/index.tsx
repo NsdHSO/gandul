@@ -5,6 +5,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { CategoryBadge } from '@/components/molecules/category-badge';
 import { useArticles } from '@/lib/hooks/use-articles';
 import type { Article } from '@/lib/models/article';
 
@@ -23,6 +24,11 @@ export default function HomeScreen() {
                     style={styles.articleImage}
                     contentFit="cover"
                 />
+                {item.category && (
+                    <View className="absolute top-2 left-2">
+                        <CategoryBadge category={item.category} size="xs" />
+                    </View>
+                )}
             </View>
 
             <View className="p-4">
