@@ -84,7 +84,7 @@ describe('ArticleTags Component', () => {
 
     it('should render tags in order', () => {
       const tags = ['first', 'second', 'third'];
-      const { getAllByText } = render(<ArticleTags tags={tags} />);
+      render(<ArticleTags tags={tags} />);
 
       // Check that tags are rendered (order verification would require testing implementation details)
       tags.forEach(tag => {

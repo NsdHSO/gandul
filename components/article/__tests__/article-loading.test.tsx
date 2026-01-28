@@ -18,7 +18,7 @@ describe('ArticleLoading Component', () => {
     });
 
     it('should render activity indicator', () => {
-      const { getByTestId, UNSAFE_getByType } = render(<ArticleLoading />);
+      render(<ArticleLoading />);
       // ActivityIndicator should be present in the component tree
       expect(screen.getByText('Loading article...')).toBeTruthy();
     });

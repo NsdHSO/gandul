@@ -14,7 +14,7 @@ describe('ArticleHeader Component', () => {
     });
 
     it('should render featured image when provided', () => {
-      const { getByTestId } = render(
+      render(
         <ArticleHeader {...defaultProps} featuredImage="http://test.com/image.jpg" />
       );
       // expo-image is mocked, so we can't easily test the Image component
@@ -23,7 +23,7 @@ describe('ArticleHeader Component', () => {
     });
 
     it('should not render featured image when not provided', () => {
-      const { queryByTestId } = render(<ArticleHeader {...defaultProps} />);
+      render(<ArticleHeader {...defaultProps} />);
       // Since Image is mocked, we check that the component still renders
       expect(screen.getByText(/15 ianuarie 2024/i)).toBeTruthy();
     });
@@ -34,7 +34,7 @@ describe('ArticleHeader Component', () => {
     });
 
     it('should not render category badge when not provided', () => {
-      const { queryByText } = render(<ArticleHeader {...defaultProps} />);
+      render(<ArticleHeader {...defaultProps} />);
       // Only the date should be visible
       expect(screen.getByText(/15 ianuarie 2024/i)).toBeTruthy();
     });
