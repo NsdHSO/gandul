@@ -9,37 +9,16 @@ global.__ExpoImportMetaRegistry = {
 
 global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 
+// Mock react-native-css-interop to prevent out-of-scope variable errors
+jest.mock('react-native-css-interop', () => ({}), { virtual: true });
+
 // Mock expo-image
 jest.mock('expo-image', () => ({
   Image: 'Image',
 }));
 
-// Mock expo-router
-jest.mock('expo-router', () => {
-  const React = require('react');
-  const { Pressable } = require('react-native');
-  return {
-    useRouter: () => ({
-      push: jest.fn(),
-      replace: jest.fn(),
-      back: jest.fn(),
-    }),
-    useLocalSearchParams: () => ({}),
-    Link: ({ children, onPress, ...props }) =>
-      React.createElement(Pressable, {
-        ...props,
-        onPress: (e) => {
-          const event = e || {};
-          event.preventDefault = event.preventDefault || jest.fn();
-          onPress?.(event);
-        },
-        testID: props.testID || 'expo-router-link'
-      }, children),
-    Stack: {
-      Screen: ({ children }) => children || null,
-    },
-  };
-});
+// Mock expo-router (implementation in __mocks__/expo-router.js)
+jest.mock('expo-router');
 
 // Mock expo-constants
 jest.mock('expo-constants', () => ({
