@@ -9,10 +9,9 @@ on:
       - master
 
 jobs:
-  build-fat:
-    name: Deploying to FAT
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
-    environment: FAT
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,6 +36,18 @@ jobs:
           path: coverage/
           retention-days: 30
         if: always()
+
+  build:
+    name: Build APK
+    needs: test
+    runs-on: ubuntu-latest
+    environment: FAT
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -93,16 +104,30 @@ jobs:
           path: android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
 
-      - name: Build summary
-        if: always()
+  deploy:
+    name: Deploy to FAT
+    needs: build
+    runs-on: ubuntu-latest
+    environment: FAT
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: gandul-fat-release-${{ github.sha }}
+
+      - name: Deploy summary
         run: |
-          echo "## Build Results 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Results 🚀" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ FAT build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "✅ FAT deployment completed successfully" >> $GITHUB_STEP_SUMMARY
           echo "📱 Environment: FAT" >> $GITHUB_STEP_SUMMARY
           echo "🌐 Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "📦 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Artifacts:" >> $GITHUB_STEP_SUMMARY
           echo "- APK: gandul-fat-release-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Coverage: coverage-report-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📋 Next steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download APK from Actions artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "2. Test the FAT build on device" >> $GITHUB_STEP_SUMMARY
+          echo "3. Create PR to promote to UAT if tests pass" >> $GITHUB_STEP_SUMMARY
