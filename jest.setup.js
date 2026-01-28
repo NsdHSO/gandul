@@ -9,9 +9,6 @@ global.__ExpoImportMetaRegistry = {
 
 global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 
-// Mock react-native-css-interop to prevent out-of-scope variable errors
-jest.mock('react-native-css-interop', () => ({}), { virtual: true });
-
 // Mock expo-image
 jest.mock('expo-image', () => ({
   Image: 'Image',
