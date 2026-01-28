@@ -30,9 +30,9 @@ export function Badge({
       <ThemedText
         size={size === 'xs' ? 'xs' : size === 'sm' ? 'sm' : 'base'}
         weight="bold"
-        className="uppercase text-white"
+        className="text-white"
       >
-        {children}
+        {children.toUpperCase()}
       </ThemedText>
     </View>
   );
