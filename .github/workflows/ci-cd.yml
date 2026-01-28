@@ -1,9 +1,6 @@
-name: CI/CD - Test and Build
+name: CI/CD - Manual Build
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
     inputs:
       environment:

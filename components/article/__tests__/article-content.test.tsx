@@ -10,8 +10,8 @@ describe('ArticleContent Component', () => {
     });
 
     it('should not render description when not provided', () => {
-      const { container } = render(<ArticleContent />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleContent />);
+      expect(root).toBeTruthy();
     });
 
     it('should handle long descriptions', () => {
@@ -38,8 +38,8 @@ describe('ArticleContent Component', () => {
     });
 
     it('should not render content when not provided', () => {
-      const { container } = render(<ArticleContent />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleContent />);
+      expect(root).toBeTruthy();
     });
 
     it('should handle very long content', () => {
@@ -89,8 +89,8 @@ describe('ArticleContent Component', () => {
     it('should handle undefined values', () => {
       render(<ArticleContent description={undefined} content={undefined} />);
       // Component should render without errors
-      const { container } = render(<ArticleContent />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleContent />);
+      expect(root).toBeTruthy();
     });
 
     it('should handle whitespace-only strings', () => {

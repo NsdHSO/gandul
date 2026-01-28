@@ -15,8 +15,8 @@ describe('ThemedView Component', () => {
     });
 
     it('should render without children', () => {
-      const { container } = render(<ThemedView />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ThemedView />);
+      expect(root).toBeTruthy();
     });
 
     it('should render multiple children', () => {

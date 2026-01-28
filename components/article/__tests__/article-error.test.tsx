@@ -60,8 +60,8 @@ describe('ArticleError Component', () => {
 
   describe('Layout', () => {
     it('should render without crashing', () => {
-      const { container } = render(<ArticleError />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleError />);
+      expect(root).toBeTruthy();
     });
 
     it('should render Error header and message', () => {

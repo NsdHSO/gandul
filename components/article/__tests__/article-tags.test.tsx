@@ -5,13 +5,13 @@ import { ArticleTags } from '../article-tags';
 describe('ArticleTags Component', () => {
   describe('Rendering', () => {
     it('should return null when tags array is empty', () => {
-      const { container } = render(<ArticleTags tags={[]} />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleTags tags={[]} />);
+      expect(root).toBeTruthy();
     });
 
     it('should return null when tags is undefined', () => {
-      const { container } = render(<ArticleTags tags={undefined as any} />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleTags tags={undefined as any} />);
+      expect(root).toBeTruthy();
     });
 
     it('should render tags header', () => {

@@ -15,15 +15,15 @@ describe('ArticleLinks Component', () => {
 
   describe('Rendering', () => {
     it('should return null when no links are provided', () => {
-      const { container } = render(<ArticleLinks />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleLinks />);
+      expect(root).toBeTruthy();
     });
 
     it('should return null when both links are undefined', () => {
-      const { container } = render(
+      const { root } = render(
         <ArticleLinks videoUrl={undefined} sourceUrl={undefined} />
       );
-      expect(container).toBeTruthy();
+      expect(root).toBeTruthy();
     });
 
     it('should render video link when videoUrl is provided', () => {
@@ -106,10 +106,10 @@ describe('ArticleLinks Component', () => {
 
   describe('Edge Cases', () => {
     it('should handle empty string URLs', () => {
-      const { container } = render(
+      const { root } = render(
         <ArticleLinks videoUrl="" sourceUrl="" />
       );
-      expect(container).toBeTruthy();
+      expect(root).toBeTruthy();
     });
 
     it('should handle special characters in URLs', () => {

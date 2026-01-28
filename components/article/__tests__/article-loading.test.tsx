@@ -26,8 +26,8 @@ describe('ArticleLoading Component', () => {
 
   describe('Layout', () => {
     it('should render without errors', () => {
-      const { container } = render(<ArticleLoading />);
-      expect(container).toBeTruthy();
+      const { root } = render(<ArticleLoading />);
+      expect(root).toBeTruthy();
     });
 
     it('should have loading message', () => {

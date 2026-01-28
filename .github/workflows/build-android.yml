@@ -1,12 +1,16 @@
-name: Build FAT (master)
+name: Build FAT
 
 on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build-fat:
+    name: Deploying to FAT
     runs-on: ubuntu-latest
     environment: FAT
     steps:
@@ -15,6 +19,24 @@ jobs:
 
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node
+
+      - name: Run linter
+        run: pnpm lint
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Generate coverage report
+        run: pnpm test:coverage
+        if: always()
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ github.sha }}
+          path: coverage/
+          retention-days: 30
+        if: always()
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -67,18 +89,20 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gandul-fat-release.apk
+          name: gandul-fat-release-${{ github.sha }}
           path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
 
       - name: Build summary
+        if: always()
         run: |
-          echo "✅ FAT build completed successfully"
-          echo "📱 Environment: FAT"
-          echo "🌐 Branch: master"
-          echo ""
-          echo "📦 APK built and uploaded as artifact"
-          echo ""
-          echo "📋 Next steps:"
-          echo "1. Download APK from Actions artifacts"
-          echo "2. Test the FAT build"
-          echo "3. Create PR to promote to UAT"
+          echo "## Build Results 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ FAT build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "📱 Environment: FAT" >> $GITHUB_STEP_SUMMARY
+          echo "🌐 Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifacts:" >> $GITHUB_STEP_SUMMARY
+          echo "- APK: gandul-fat-release-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage: coverage-report-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

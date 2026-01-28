@@ -10,8 +10,8 @@ describe('HelloWave Component', () => {
     });
 
     it('should render without crashing', () => {
-      const { container } = render(<HelloWave />);
-      expect(container).toBeTruthy();
+      const { root } = render(<HelloWave />);
+      expect(root).toBeTruthy();
     });
   });
 

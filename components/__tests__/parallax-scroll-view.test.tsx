@@ -29,10 +29,10 @@ describe('ParallaxScrollView Component', () => {
     });
 
     it('should render without children', () => {
-      const { container } = render(
+      const { root } = render(
         <ParallaxScrollView {...defaultProps} />
       );
-      expect(container).toBeTruthy();
+      expect(root).toBeTruthy();
     });
 
     it('should render multiple children', () => {
@@ -71,7 +71,7 @@ describe('ParallaxScrollView Component', () => {
     });
 
     it('should use light background color', () => {
-      const { container } = render(
+      const { root } = render(
         <ParallaxScrollView
           headerImage={<View />}
           headerBackgroundColor={{ dark: '#000', light: '#fff' }}
@@ -79,11 +79,11 @@ describe('ParallaxScrollView Component', () => {
           <Text>Content</Text>
         </ParallaxScrollView>
       );
-      expect(container).toBeTruthy();
+      expect(root).toBeTruthy();
     });
 
     it('should accept different background colors', () => {
-      const { container } = render(
+      const { root } = render(
         <ParallaxScrollView
           headerImage={<View />}
           headerBackgroundColor={{ dark: '#123456', light: '#abcdef' }}
@@ -91,7 +91,7 @@ describe('ParallaxScrollView Component', () => {
           <Text>Content</Text>
         </ParallaxScrollView>
       );
-      expect(container).toBeTruthy();
+      expect(root).toBeTruthy();
     });
   });
 
@@ -175,7 +175,7 @@ describe('ParallaxScrollView Component', () => {
     });
 
     it('should handle empty header image', () => {
-      const { container } = render(
+      const { root } = render(
         <ParallaxScrollView
           headerImage={<></>}
           headerBackgroundColor={defaultProps.headerBackgroundColor}
@@ -183,7 +183,7 @@ describe('ParallaxScrollView Component', () => {
           <Text>Content</Text>
         </ParallaxScrollView>
       );
-      expect(container).toBeTruthy();
+      expect(root).toBeTruthy();
       expect(screen.getByText('Content')).toBeTruthy();
     });
   });
@@ -200,7 +200,7 @@ describe('ParallaxScrollView Component', () => {
     });
 
     it('should maintain component structure', () => {
-      const { container } = render(
+      const { root } = render(
         <ParallaxScrollView
           headerImage={<View testID="test-header" />}
           headerBackgroundColor={{ dark: '#000', light: '#fff' }}
@@ -210,7 +210,7 @@ describe('ParallaxScrollView Component', () => {
           </View>
         </ParallaxScrollView>
       );
-      expect(container).toBeTruthy();
+      expect(root).toBeTruthy();
     });
   });
 });
