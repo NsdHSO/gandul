@@ -76,8 +76,14 @@ jest.mock('react-native-reanimated', () => {
 // Mock @react-navigation/elements
 // Keep this mock free of any out-of-scope imports (like react-native)
 // to comply with Jest's mock factory restrictions.
-jest.mock('@react-navigation/elements', () => ({
-  PlatformPressable: ({ children }) => children || null,
-}));
+jest.mock('@react-navigation/elements', () => {
+  const React = require('react');
+  return {
+    PlatformPressable: (props) => {
+      const { children, ...otherProps } = props;
+      return React.createElement('View', otherProps, children);
+    },
+  };
+});
 
 // Mock Linking module will be done per-test as needed

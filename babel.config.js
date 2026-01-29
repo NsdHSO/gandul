@@ -1,7 +1,8 @@
 // babel.config.js
 module.exports = function (api) {
   api.cache(true);
-  const isTest = api.env('test');
+  // Use JEST_WORKER_ID to detect Jest environment (more reliable in CI)
+  const isTest = process.env.JEST_WORKER_ID !== undefined;
 
   return {
     presets: [
