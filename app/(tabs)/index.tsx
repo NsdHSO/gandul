@@ -2,12 +2,18 @@ import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
+import Constants from 'expo-constants';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CategoryBadge } from '@/components/molecules/category-badge';
 import { useArticles } from '@/lib/hooks/use-articles';
 import type { Article } from '@/lib/models/article';
+
+// Get the GraphQL URL for debugging
+const GRAPHQL_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_GRAPHQL_URL ||
+                   process.env.EXPO_PUBLIC_GRAPHQL_URL ||
+                   'http://localhost:2003/strapi-proxy';
 
 export default function HomeScreen() {
     const { articles, loading, loadingMore, error, refetch, loadMore } = useArticles();
@@ -69,21 +75,36 @@ export default function HomeScreen() {
 
     if (error) {
         return (
-            <ThemedView className="flex-1 items-center justify-center p-4">
-                <ThemedText size="lg" weight="semibold" className="mb-2 text-red-600">
-                    Error
-                </ThemedText>
-                <ThemedText size="base" align="center" className="mb-4">
-                    {error}
-                </ThemedText>
-                <Pressable
-                    onPress={refetch}
-                    className="rounded-lg bg-blue-600 px-6 py-3"
-                >
-                    <ThemedText size="base" weight="medium" className="text-white">
-                        Retry
+            <ThemedView className="flex-1 p-4">
+                {/* Debug Banner */}
+                <View className="bg-yellow-500 p-3 mb-4">
+                    <ThemedText size="xs" weight="bold" className="text-black mb-1">
+                        DEBUG - API URL:
                     </ThemedText>
-                </Pressable>
+                    <ThemedText size="xs" className="text-black" numberOfLines={2}>
+                        {GRAPHQL_URL}
+                    </ThemedText>
+                    <ThemedText size="xs" className="text-black mt-1">
+                        Env: {Constants.expoConfig?.extra?.EXPO_PUBLIC_ENV || 'unknown'}
+                    </ThemedText>
+                </View>
+
+                <View className="flex-1 items-center justify-center">
+                    <ThemedText size="lg" weight="semibold" className="mb-2 text-red-600">
+                        Error
+                    </ThemedText>
+                    <ThemedText size="base" align="center" className="mb-4">
+                        {error}
+                    </ThemedText>
+                    <Pressable
+                        onPress={refetch}
+                        className="rounded-lg bg-blue-600 px-6 py-3"
+                    >
+                        <ThemedText size="base" weight="medium" className="text-white">
+                            Retry
+                        </ThemedText>
+                    </Pressable>
+                </View>
             </ThemedView>
         );
     }
@@ -102,6 +123,19 @@ export default function HomeScreen() {
         <ThemedView className="flex-1"
         style={{ width: '100%' }}
         >
+            {/* Debug Banner - Shows API URL */}
+            <View className="bg-yellow-500 p-3">
+                <ThemedText size="xs" weight="bold" className="text-black mb-1">
+                    DEBUG - API URL:
+                </ThemedText>
+                <ThemedText size="xs" className="text-black" numberOfLines={2}>
+                    {GRAPHQL_URL}
+                </ThemedText>
+                <ThemedText size="xs" className="text-black mt-1">
+                    Env: {Constants.expoConfig?.extra?.EXPO_PUBLIC_ENV || 'unknown'}
+                </ThemedText>
+            </View>
+
             <FlashList
                 data={articles}
                 renderItem={renderArticle}
