@@ -52,6 +52,7 @@
     "urql": "^5.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.28.6",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^30.0.0",

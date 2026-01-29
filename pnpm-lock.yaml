@@ -108,6 +108,9 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(@urql/core@5.2.0(graphql@16.12.0))(react@19.1.0)
     devDependencies:
+      '@babel/plugin-transform-react-jsx':
+        specifier: ^7.28.6
+        version: 7.28.6(@babel/core@7.28.6)
       '@testing-library/jest-native':
         specifier: ^5.4.3
         version: 5.4.3(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react-test-renderer@19.1.0(react@19.1.0))(react@19.1.0)
