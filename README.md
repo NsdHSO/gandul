@@ -1,6 +1,22 @@
 # Welcome to your Expo app 👋
-Fat tried to build 
+
+[![Build FAT](https://github.com/NsdHSO/gandul/actions/workflows/build-android.yml/badge.svg)](https://github.com/NsdHSO/gandul/actions/workflows/build-android.yml)
+
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+
+## Download Latest APK
+
+Download the latest FAT build APK for Android:
+
+**[📥 Download Latest FAT APK](https://github.com/NsdHSO/gandul/releases/tag/latest-fat)**
+
+The APK is automatically updated after each successful build on the master branch.
+
+### Installation
+1. Click the download link above
+2. Download the `gandul-fat-*.apk` file
+3. Enable "Install from Unknown Sources" on your Android device
+4. Install the APK
 
 ## Get started
 

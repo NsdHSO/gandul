@@ -109,11 +109,42 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: FAT
+    permissions:
+      contents: write
     steps:
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
           name: gandul-fat-release-${{ github.sha }}
+
+      - name: Rename APK
+        run: mv app-release.apk gandul-fat-${{ github.sha }}.apk
+
+      - name: Create Release Body
+        id: release-body
+        run: |
+          cat << 'EOF' > release-body.md
+          ## Latest FAT Build 🚀
+
+          **Branch:** ${{ github.ref_name }}
+          **Commit:** ${{ github.sha }}
+          **Build Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          ### Download
+          Download the APK file below and install it on your Android device.
+          EOF
+
+      - name: Create/Update Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest-fat
+          name: Latest FAT Build
+          body_path: release-body.md
+          files: gandul-fat-${{ github.sha }}.apk
+          prerelease: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy summary
         run: |
@@ -124,10 +155,10 @@ jobs:
           echo "🌐 Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "📦 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Artifacts:" >> $GITHUB_STEP_SUMMARY
-          echo "- APK: gandul-fat-release-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Download:" >> $GITHUB_STEP_SUMMARY
+          echo "- [📥 Latest FAT APK](https://github.com/${{ github.repository }}/releases/tag/latest-fat)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📋 Next steps:" >> $GITHUB_STEP_SUMMARY
-          echo "1. Download APK from Actions artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download APK from the release link above" >> $GITHUB_STEP_SUMMARY
           echo "2. Test the FAT build on device" >> $GITHUB_STEP_SUMMARY
           echo "3. Create PR to promote to UAT if tests pass" >> $GITHUB_STEP_SUMMARY
