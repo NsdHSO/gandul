@@ -38,7 +38,7 @@ jobs:
         if: always()
 
   build:
-    name: Build iOS IPA
+    name: Build IPA
     needs: test
     runs-on: macos-latest
     environment: FAT
@@ -105,50 +105,44 @@ jobs:
           xcodebuild -workspace Gandul.xcworkspace \
             -scheme Gandul \
             -configuration Release \
-            -archivePath build/Gandul.xcarchive \
+            -sdk iphoneos \
+            -derivedDataPath build \
             -allowProvisioningUpdates \
-            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            archive
+            DEVELOPMENT_TEAM="" \
+            build
         env:
           EXPO_PUBLIC_GRAPHQL_URL: ${{ secrets.FAT_GRAPHQL_URL }}
           EXPO_PUBLIC_ENV: fat
 
-      - name: Export IPA
+      - name: Create IPA from App
         working-directory: ios
         run: |
-          # Create export options plist for ad-hoc distribution
-          cat > ExportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>development</string>
-            <key>uploadSymbols</key>
-            <true/>
-            <key>compileBitcode</key>
-            <false/>
-          </dict>
-          </plist>
-          EOF
+          # Find the .app file
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -n 1)
 
-          xcodebuild -exportArchive \
-            -archivePath build/Gandul.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath build \
-            -allowProvisioningUpdates
+          # Create Payload directory
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+
+          # Create IPA
+          zip -r Gandul.ipa Payload
+
+          # Move IPA to build directory
+          mkdir -p build/ipa
+          mv Gandul.ipa build/ipa/
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: gandul-fat-ios-${{ github.sha }}
-          path: ios/build/*.ipa
+          path: ios/build/ipa/Gandul.ipa
           retention-days: 30
 
   deploy:
-    name: Deploy iOS to FAT
+    name: Deploy to FAT
     needs: build
     runs-on: ubuntu-latest
     environment: FAT
@@ -161,7 +155,7 @@ jobs:
           name: gandul-fat-ios-${{ github.sha }}
 
       - name: Rename IPA
-        run: mv *.ipa gandul-fat-ios-${{ github.sha }}.ipa
+        run: mv Gandul.ipa gandul-fat-ios-${{ github.sha }}.ipa
 
       - name: Create Release Body
         id: release-body
@@ -174,9 +168,10 @@ jobs:
           **Build Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
           ### Download & Install
-          1. Download the IPA file below
-          2. Install using a tool like [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)
-          3. Or deploy via Apple TestFlight (if configured)
+          Download the IPA file below and install it on your iOS device using:
+          - [AltStore](https://altstore.io/)
+          - [Sideloadly](https://sideloadly.io/)
+          - Apple TestFlight (if configured)
           EOF
 
       - name: Create/Update Release
@@ -197,14 +192,13 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ iOS FAT deployment completed successfully" >> $GITHUB_STEP_SUMMARY
           echo "📱 Platform: iOS" >> $GITHUB_STEP_SUMMARY
-          echo "🌐 Environment: FAT" >> $GITHUB_STEP_SUMMARY
-          echo "📦 Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "🔖 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "🌐 Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Download:" >> $GITHUB_STEP_SUMMARY
           echo "- [📥 Latest iOS FAT IPA](https://github.com/${{ github.repository }}/releases/tag/latest-fat-ios)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📋 Installation:" >> $GITHUB_STEP_SUMMARY
+          echo "📋 Next steps:" >> $GITHUB_STEP_SUMMARY
           echo "1. Download IPA from the release link above" >> $GITHUB_STEP_SUMMARY
           echo "2. Install using AltStore, Sideloadly, or TestFlight" >> $GITHUB_STEP_SUMMARY
           echo "3. Test the FAT build on your iOS device" >> $GITHUB_STEP_SUMMARY
