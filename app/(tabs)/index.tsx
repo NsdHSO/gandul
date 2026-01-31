@@ -115,18 +115,6 @@ export default function HomeScreen() {
         <ThemedView className="flex-1"
                     style={{ width: '100%' }}
         >
-            {/* Debug Banner - Shows API URL */}
-            <View className="bg-yellow-500 p-3">
-                <ThemedText size="xs" weight="bold" className="text-black mb-1">
-                    DEBUG - API URL:
-                </ThemedText>
-                <ThemedText size="xs" className="text-black" numberOfLines={2}>
-                    {GRAPHQL_URL}
-                </ThemedText>
-                <ThemedText size="xs" className="text-black mt-1">
-                    Env: {CURRENT_ENV}
-                </ThemedText>
-            </View>
 
             <FlashList
                 data={articles}
