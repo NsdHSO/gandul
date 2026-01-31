@@ -1,4 +1,4 @@
-name: Build FAT
+name: Build Android FAT
 
 on:
   push:
