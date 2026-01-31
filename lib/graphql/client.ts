@@ -14,12 +14,6 @@ if (!__DEV__) {
   }
 }
 
-// Debug logging to help troubleshoot connectivity issues
-console.log('=== GraphQL Client Configuration ===');
-console.log('GraphQL URL:', GRAPHQL_URL);
-console.log('process.env.EXPO_PUBLIC_GRAPHQL_URL inlined:', process.env.EXPO_PUBLIC_GRAPHQL_URL);
-console.log('===================================');
-
 export const graphqlClient = new Client({
   url: GRAPHQL_URL as string,
   exchanges: [cacheExchange, fetchExchange],

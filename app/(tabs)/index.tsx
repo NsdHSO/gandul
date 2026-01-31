@@ -14,7 +14,14 @@ const GRAPHQL_URL = process.env.EXPO_PUBLIC_GRAPHQL_URL ?? 'not set';
 const CURRENT_ENV = process.env.EXPO_PUBLIC_ENV ?? 'unknown';
 
 export default function HomeScreen() {
-    const { articles, loading, loadingMore, error, refetch, loadMore } = useArticles();
+    const {
+        articles,
+        loading,
+        loadingMore,
+        error,
+        refetch,
+        loadMore
+    } = useArticles();
     const router = useRouter();
 
     const renderArticle = ({ item }: { item: Article }) => (
@@ -30,7 +37,7 @@ export default function HomeScreen() {
                 />
                 {item.category && (
                     <View className="absolute top-2 left-2">
-                        <CategoryBadge category={item.category} size="xs" />
+                        <CategoryBadge category={item.category} size="xs"/>
                     </View>
                 )}
             </View>
@@ -63,7 +70,7 @@ export default function HomeScreen() {
     if (loading) {
         return (
             <ThemedView className="flex-1 items-center justify-center">
-                <ActivityIndicator size="large" />
+                <ActivityIndicator size="large"/>
                 <ThemedText size="base" className="mt-4">
                     Loading articles...
                 </ThemedText>
@@ -74,19 +81,6 @@ export default function HomeScreen() {
     if (error) {
         return (
             <ThemedView className="flex-1 p-4">
-                {/* Debug Banner */}
-                <View className="bg-yellow-500 p-3 mb-4">
-                    <ThemedText size="xs" weight="bold" className="text-black mb-1">
-                        DEBUG - API URL:
-                    </ThemedText>
-                    <ThemedText size="xs" className="text-black" numberOfLines={2}>
-                        {GRAPHQL_URL}
-                    </ThemedText>
-                    <ThemedText size="xs" className="text-black mt-1">
-                        Env: {CURRENT_ENV}
-                    </ThemedText>
-                </View>
-
                 <View className="flex-1 items-center justify-center">
                     <ThemedText size="lg" weight="semibold" className="mb-2 text-red-600">
                         Error
@@ -112,14 +106,14 @@ export default function HomeScreen() {
 
         return (
             <View className="py-4">
-                <ActivityIndicator size="small" />
+                <ActivityIndicator size="small"/>
             </View>
         );
     };
 
     return (
         <ThemedView className="flex-1"
-        style={{ width: '100%' }}
+                    style={{ width: '100%' }}
         >
             {/* Debug Banner - Shows API URL */}
             <View className="bg-yellow-500 p-3">
