@@ -2,7 +2,6 @@ import { Image } from 'expo-image';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
-import Constants from 'expo-constants';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -10,10 +9,9 @@ import { CategoryBadge } from '@/components/molecules/category-badge';
 import { useArticles } from '@/lib/hooks/use-articles';
 import type { Article } from '@/lib/models/article';
 
-// Get the GraphQL URL for debugging
-const GRAPHQL_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_GRAPHQL_URL ||
-                   process.env.EXPO_PUBLIC_GRAPHQL_URL ||
-                   'http://localhost:2003/strapi-proxy';
+// Get the GraphQL URL for debugging (compile-time inlined)
+const GRAPHQL_URL = process.env.EXPO_PUBLIC_GRAPHQL_URL ?? 'not set';
+const CURRENT_ENV = process.env.EXPO_PUBLIC_ENV ?? 'unknown';
 
 export default function HomeScreen() {
     const { articles, loading, loadingMore, error, refetch, loadMore } = useArticles();
@@ -85,7 +83,7 @@ export default function HomeScreen() {
                         {GRAPHQL_URL}
                     </ThemedText>
                     <ThemedText size="xs" className="text-black mt-1">
-                        Env: {Constants.expoConfig?.extra?.EXPO_PUBLIC_ENV || 'unknown'}
+                        Env: {CURRENT_ENV}
                     </ThemedText>
                 </View>
 
@@ -132,7 +130,7 @@ export default function HomeScreen() {
                     {GRAPHQL_URL}
                 </ThemedText>
                 <ThemedText size="xs" className="text-black mt-1">
-                    Env: {Constants.expoConfig?.extra?.EXPO_PUBLIC_ENV || 'unknown'}
+                    Env: {CURRENT_ENV}
                 </ThemedText>
             </View>
 

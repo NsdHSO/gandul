@@ -1,19 +1,27 @@
 import { Client, cacheExchange, fetchExchange } from 'urql';
-import Constants from 'expo-constants';
 
-const GRAPHQL_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_GRAPHQL_URL ||
-                   process.env.EXPO_PUBLIC_GRAPHQL_URL ||
-                   'http://localhost:2003/strapi-proxy';
+// Read at bundle-time. In production, Constants.expoConfig is not guaranteed,
+// so rely on compile-time inlining of EXPO_PUBLIC_* envs.
+const fromEnv = process.env.EXPO_PUBLIC_GRAPHQL_URL;
+const fallback = __DEV__ ? 'http://localhost:2003/strapi-proxy' : undefined;
+const GRAPHQL_URL = fromEnv ?? fallback;
+
+// Fail fast in release if URL is missing or points to localhost (unreachable on device)
+if (!__DEV__) {
+  const isLocalhost = typeof GRAPHQL_URL === 'string' && /(^|\/\/)(localhost|127\.0\.0\.1)([:/]|$)/.test(GRAPHQL_URL);
+  if (!GRAPHQL_URL || isLocalhost) {
+    throw new Error('Missing/invalid EXPO_PUBLIC_GRAPHQL_URL for release build');
+  }
+}
 
 // Debug logging to help troubleshoot connectivity issues
 console.log('=== GraphQL Client Configuration ===');
 console.log('GraphQL URL:', GRAPHQL_URL);
-console.log('Constants.expoConfig?.extra:', Constants.expoConfig?.extra);
-console.log('process.env.EXPO_PUBLIC_GRAPHQL_URL:', process.env.EXPO_PUBLIC_GRAPHQL_URL);
+console.log('process.env.EXPO_PUBLIC_GRAPHQL_URL inlined:', process.env.EXPO_PUBLIC_GRAPHQL_URL);
 console.log('===================================');
 
 export const graphqlClient = new Client({
-  url: GRAPHQL_URL,
+  url: GRAPHQL_URL as string,
   exchanges: [cacheExchange, fetchExchange],
   fetchOptions: () => {
     return {

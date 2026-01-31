@@ -75,6 +75,17 @@ jobs:
             -keypass ${{ secrets.KEY_PASSWORD || 'gandul123' }} \
             -dname "CN=Gandul, OU=Mobile, O=Gandul, L=Bucharest, ST=Romania, C=RO"
 
+      - name: Validate environment variables
+        run: |
+          if [ -z "${EXPO_PUBLIC_GRAPHQL_URL}" ]; then
+            echo "::error::EXPO_PUBLIC_GRAPHQL_URL is not set. Define FAT_GRAPHQL_URL secret." && exit 1
+          fi
+          if printf "%s" "$EXPO_PUBLIC_GRAPHQL_URL" | grep -Eq '^http://(localhost|127\.0\.0\.1)'; then
+            echo "::error::Refusing to build release with localhost URL. Set FAT_GRAPHQL_URL to a reachable host." && exit 1
+          fi
+        env:
+          EXPO_PUBLIC_GRAPHQL_URL: ${{ secrets.FAT_GRAPHQL_URL }}
+
       - name: Prebuild Android
         run: npx expo prebuild --platform android --clean
         env:

@@ -24,6 +24,8 @@ module.exports = {
       package: "ro.gandul.app",
       versionCode: 1,
       permissions: ["INTERNET", "ACCESS_NETWORK_STATE"],
+      // Allow HTTP in non-production builds so FAT/UAT can use test endpoints without HTTPS
+      usesCleartextTraffic: process.env.EXPO_PUBLIC_ENV !== 'production',
     },
     web: {
       output: "static",
